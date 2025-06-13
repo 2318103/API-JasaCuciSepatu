@@ -1,18 +1,15 @@
-import express from 'express'
-import authRoutes from './routes/auth.routes.js'
-// import { errorHandler } from './middlewares/error.js'
+import express from 'express';
+import authRouter from './routes/auth.route.js';
+import errorHandler from './middlewares/error.js';
 
-const app = express()
+const app = express();
 
-app.use(express.json())
+app.use(express.json());
 
 // Routes
-app.use('/auth', authRoutes)
+app.use('/auth', authRouter);
 
-// Error handler
-// app.use(errorHandler)
+// Error handling
+app.use(errorHandler);
 
-const PORT = process.env.PORT || 3000
-app.listen(PORT, () => {
-  console.log(`Server berjalan di port ${PORT}`)
-})
+export default app;

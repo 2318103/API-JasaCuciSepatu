@@ -2,10 +2,11 @@
   "name": "api-jasacucisepatu",
   "version": "1.0.0",
   "main": "index.js",
-  "type":"module",
+  "type": "module",
   "scripts": {
-    "start": "node src/app.js",
-    "seed-admin": "node src/seed-admin.js"
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "seed": "node prisma/seed.js"
   },
   "keywords": [],
   "author": "",
@@ -17,6 +18,7 @@
     "express": "^5.1.0",
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
+    "nodemon": "^3.1.10",
     "prisma": "^6.9.0",
     "swagger": "^0.7.5",
     "swagger-ui-express": "^5.0.1"
