@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createService, getServices, updateService, deleteService } from '../controllers/service.js';
+import { createService, getServices, getService, updateService, deleteService } from '../controllers/service.js';
 import { validate } from '../middlewares/validate.js';
 import { createServiceSchema, updateServiceSchema } from '../validations/service.js';
 import { needAdmin } from '../middlewares/auth.js';
@@ -8,7 +8,7 @@ const router = Router();
 
 // Public routes
 router.get('/', getServices);
-router.get('/:id', getServices);
+router.get('/:id', getService);
 
 // Admin routes
 router.post('/', needAdmin, validate(createServiceSchema), createService);

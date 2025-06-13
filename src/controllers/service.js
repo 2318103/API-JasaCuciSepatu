@@ -15,6 +15,19 @@ export const getServices = async (req, res) => {
     res.json({ services });
 };
 
+export const getService = async (req, res) => {
+    const { id } = req.params;
+    const service = await prisma.service.findUnique({
+        where: { id: parseInt(id, 10) }
+    });
+
+    if (!service) {
+        return res.status(404).json({ message: 'Service not found' });
+    }
+
+    res.json({ service });
+};
+
 export const updateService = async (req, res) => {
 const { id } = req.params;
 
