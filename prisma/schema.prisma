@@ -27,14 +27,27 @@ model Admin {
 }
 
 model Order {
-  id          String      @id @default(uuid())
+  id          Int         @id @default(autoincrement())
   user        User        @relation(fields: [userId], references: [id])
   userId      String
-  serviceType String
+  service     Service     @relation(fields: [serviceId], references: [id])  // Relasi ke Service
+  serviceId   Int
   status      OrderStatus @default(RECEIVED)
   notes       String?
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
+}
+
+model Service {
+  id          Int        @id @default(autoincrement())
+  name        String
+  price       Float
+  duration    Int
+  description String?
+  isActive    Boolean    @default(true)
+  orders      Order[]    // Relasi ke Order 
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 }
 
 enum OrderStatus {
