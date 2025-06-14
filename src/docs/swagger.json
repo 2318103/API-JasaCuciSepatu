@@ -65,7 +65,7 @@
         }
       }
     },
-    "/auth/user/login": {
+    "/auth/login": {
       "post": {
         "tags": [
           "Authentication"
@@ -228,7 +228,7 @@
         }
       }
     },
-    "/services": {
+    "/service": {
       "post": {
         "tags": [
           "Service Management"
@@ -307,7 +307,7 @@
         }
       }
     },
-    "/services/{id}": {
+    "/service/{id}": {
       "put": {
         "tags": [
           "Service Management"
