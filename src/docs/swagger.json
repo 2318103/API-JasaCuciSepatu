@@ -1,100 +1,483 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "API - Layanan Jasa Cuci Sepatu",
+    "title": "Cuci Sepatu API",
     "version": "1.0.0",
-    "description": "pada API ini kegiatan sepenuhnya dilakukan oleh admin, customer hanya bisa melakukan login kemudian mengambil data orderan miliknya"
+    "description": "API untuk manajemen jasa cuci sepatu"
   },
   "servers": [
     {
-      "url": "localhost:3000"
+      "url": "http://localhost:3000",
+      "description": "Development server"
     }
   ],
   "paths": {
     "/auth/admin/login": {
-      "parameters": [],
       "post": {
-        "summary": "Login Admin",
-        "parameters": [
-          {
-            "name": "Content-Type",
-            "in": "header",
-            "required": false,
-            "example": "application/json",
-            "schema": {
-              "type": "string"
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Login admin",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "example": "admin1"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "password123"
+                  }
+                }
+              }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
-            "headers": {
-              "X-Powered-By": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "Express"
-              },
-              "Content-Type": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "application/json; charset=utf-8"
-              },
-              "Content-Length": {
-                "schema": {
-                  "type": "integer"
-                },
-                "example": "317"
-              },
-              "ETag": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "W/\"13d-uZ7BCeTqf61tsZYYjzqUVXTf2zM\""
-              },
-              "Date": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "Sat, 14 Jun 2025 01:28:30 GMT"
-              },
-              "Connection": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "keep-alive"
-              },
-              "Keep-Alive": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "timeout=5"
-              }
-            },
-            "description": "berhasil login",
+            "description": "Login berhasil",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "success": {
-                      "type": "boolean"
+                    "token": {
+                      "type": "string"
                     },
-                    "data": {
+                    "admin": {
                       "type": "object",
                       "properties": {
-                        "token": {
+                        "username": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/user/login": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Login user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "example": "john_doe"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "user123"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login berhasil",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    },
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "username": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/admin/register-user": {
+      "post": {
+        "tags": [
+          "User Management"
+        ],
+        "summary": "Registrasi user oleh admin",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "example": "new_user"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "example": "08987654321"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "user123"
+                  },
+                  "name": {
+                    "type": "string",
+                    "example": "New User"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User berhasil dibuat",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": {
+                      "type": "object",
+                      "properties": {
+                        "username": {
                           "type": "string"
                         },
-                        "admin": {
-                          "type": "object",
-                          "properties": {
-                            "id": {
-                              "type": "string"
-                            },
-                            "username": {
-                              "type": "string"
+                        "phone": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/customers": {
+      "get": {
+        "tags": [
+          "User Management"
+        ],
+        "summary": "Get semua customer (admin only)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Daftar customer",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "customers": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer"
+                          },
+                          "username": {
+                            "type": "string"
+                          },
+                          "phone": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/services": {
+      "post": {
+        "tags": [
+          "Service Management"
+        ],
+        "summary": "Buat layanan baru (admin only)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Cuci Express"
+                  },
+                  "price": {
+                    "type": "number",
+                    "example": 75000
+                  },
+                  "duration": {
+                    "type": "integer",
+                    "example": 24
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Layanan berhasil dibuat"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Service Management"
+        ],
+        "summary": "Get semua layanan",
+        "responses": {
+          "200": {
+            "description": "Daftar layanan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "services": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "price": {
+                            "type": "number"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/services/{id}": {
+      "put": {
+        "tags": [
+          "Service Management"
+        ],
+        "summary": "Update layanan (admin only)",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "price": {
+                    "type": "number"
+                  },
+                  "duration": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Layanan berhasil diupdate"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Service Management"
+        ],
+        "summary": "Hapus layanan (admin only)",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Layanan berhasil dihapus"
+          }
+        }
+      }
+    },
+    "/order": {
+      "post": {
+        "tags": [
+          "Order Management"
+        ],
+        "summary": "Buat order baru (admin only)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "type": "integer",
+                    "example": 1
+                  },
+                  "serviceId": {
+                    "type": "integer",
+                    "example": 1
+                  },
+                  "notes": {
+                    "type": "string",
+                    "example": "Noda lumpur"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Order berhasil dibuat",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "order": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer"
+                        },
+                        "status": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Order Management"
+        ],
+        "summary": "Get semua order",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Daftar order",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "orders": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer"
+                          },
+                          "status": {
+                            "type": "string"
+                          },
+                          "service": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string"
+                              }
                             }
                           }
                         }
@@ -108,86 +491,45 @@
         }
       }
     },
-    "/auth/admin/register-user": {
-      "parameters": [],
-      "post": {
-        "summary": "Register User (byAdmin)",
+    "/order/{id}": {
+      "get": {
+        "tags": [
+          "Order Management"
+        ],
+        "summary": "Get detail order",
         "parameters": [
           {
-            "name": "Content-Type",
-            "in": "header",
-            "required": false,
-            "example": "application/json",
+            "in": "path",
+            "name": "id",
+            "required": true,
             "schema": {
-              "type": "string"
+              "type": "integer"
             }
           }
         ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
-          "201": {
-            "headers": {
-              "X-Powered-By": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "Express"
-              },
-              "Content-Type": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "application/json; charset=utf-8"
-              },
-              "Content-Length": {
-                "schema": {
-                  "type": "integer"
-                },
-                "example": "101"
-              },
-              "ETag": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "W/\"65-ADB5+kRZgJAVtDb+NuqYVFSWArU\""
-              },
-              "Date": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "Sat, 14 Jun 2025 01:32:00 GMT"
-              },
-              "Connection": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "keep-alive"
-              },
-              "Keep-Alive": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "timeout=5"
-              }
-            },
-            "description": "berhasil daftar",
+          "200": {
+            "description": "Detail order",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "success": {
-                      "type": "boolean"
-                    },
-                    "data": {
+                    "order": {
                       "type": "object",
                       "properties": {
                         "id": {
+                          "type": "integer"
+                        },
+                        "status": {
                           "type": "string"
                         },
-                        "username": {
-                          "type": "string"
-                        },
-                        "name": {
+                        "notes": {
                           "type": "string"
                         }
                       }
@@ -198,337 +540,229 @@
             }
           }
         }
-      }
-    },
-    "/": {
-      "parameters": [],
-      "get": {
-        "summary": "Data Customer",
-        "parameters": [],
+      },
+      "delete": {
+        "tags": [
+          "Order Management"
+        ],
+        "summary": "Hapus order (admin only)",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "200": {
-            "headers": {
-              "X-Powered-By": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "Express"
-              },
-              "Content-Type": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "application/json; charset=utf-8"
-              },
-              "Content-Length": {
-                "schema": {
-                  "type": "integer"
-                },
-                "example": "624"
-              },
-              "ETag": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "W/\"270-DoDZfqOgrplTFCuWFDAAT4+615g\""
-              },
-              "Date": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "Sat, 14 Jun 2025 01:32:23 GMT"
-              },
-              "Connection": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "keep-alive"
-              },
-              "Keep-Alive": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "timeout=5"
-              }
-            },
-            "description": "data user",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean"
-                    },
-                    "data": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "type": "string"
-                          },
-                          "username": {
-                            "type": "string"
-                          },
-                          "name": {
-                            "type": "string"
-                          },
-                          "phone": {
-                            "type": "string",
-                            "format": "utc-millisec"
-                          },
-                          "email": {
-                            "type": "string",
-                            "format": "email"
-                          },
-                          "createdAt": {
-                            "type": "string",
-                            "format": "date-time"
-                          },
-                          "orders": {
-                            "type": "array",
-                            "items": {}
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
+            "description": "Order berhasil dihapus"
           }
         }
       }
     },
-    "/service/": {
-      "parameters": [],
-      "post": {
-        "summary": "Tambah Layanan",
-        "parameters": [
-          {
-            "name": "Content-Type",
-            "in": "header",
-            "required": false,
-            "example": "application/json",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {},
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string"
-                  },
-                  "price": {
-                    "type": "integer"
-                  },
-                  "duration": {
-                    "type": "integer"
-                  },
-                  "description": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "get": {
-        "summary": "Data Layanan",
-        "parameters": [
-          {
-            "name": "Content-Type",
-            "in": "header",
-            "required": false,
-            "example": "application/json",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {}
-      }
-    },
-    "/service/1": {
-      "parameters": [],
-      "put": {
-        "summary": "Edit Layanan",
-        "parameters": [
-          {
-            "name": "Content-Type",
-            "in": "header",
-            "required": false,
-            "example": "application/json",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {},
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "price": {
-                    "type": "integer"
-                  },
-                  "duration": {
-                    "type": "integer"
-                  },
-                  "description": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "summary": "Hapus Layanan",
-        "parameters": [
-          {
-            "name": "Content-Type",
-            "in": "header",
-            "required": false,
-            "example": "application/json",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {}
-      }
-    },
-    "/order/": {
-      "parameters": [],
-      "post": {
-        "summary": "Tambah order",
-        "parameters": [
-          {
-            "name": "Content-Type",
-            "in": "header",
-            "required": false,
-            "example": "application/json",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {},
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "userId": {
-                    "type": "integer"
-                  },
-                  "serviceId": {
-                    "type": "integer"
-                  },
-                  "notes": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "get": {
-        "summary": "Semua data order",
-        "parameters": [
-          {
-            "name": "Content-Type",
-            "in": "header",
-            "required": false,
-            "example": "application/json",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {}
-      }
-    },
-    "/order/1": {
-      "parameters": [],
-      "delete": {
-        "summary": "Hapus order",
-        "parameters": [
-          {
-            "name": "Content-Type",
-            "in": "header",
-            "required": false,
-            "example": "application/json",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {}
-      }
-    },
-    "/order/2": {
-      "parameters": [],
-      "get": {
-        "summary": "Data order by id",
-        "parameters": [
-          {
-            "name": "Content-Type",
-            "in": "header",
-            "required": false,
-            "example": "application/json",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {}
-      }
-    },
-    "/order/1/status": {
-      "parameters": [],
+    "/orders/{id}/status": {
       "patch": {
-        "summary": "update status",
+        "tags": [
+          "Order Management"
+        ],
+        "summary": "Update status order (admin only)",
         "parameters": [
           {
-            "name": "Content-Type",
-            "in": "header",
-            "required": false,
-            "example": "application/json",
+            "in": "path",
+            "name": "id",
+            "required": true,
             "schema": {
-              "type": "string"
+              "type": "integer"
             }
           }
         ],
-        "responses": {},
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
                   "status": {
-                    "type": "string"
+                    "type": "string",
+                    "enum": [
+                      "RECEIVED",
+                      "IN_PROGRESS",
+                      "READY_FOR_PICKUP",
+                      "COMPLETED"
+                    ],
+                    "example": "IN_PROGRESS"
                   }
                 }
               }
             }
           }
+        },
+        "responses": {
+          "200": {
+            "description": "Status berhasil diupdate"
+          }
         }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier for the user"
+          },
+          "username": {
+            "type": "string",
+            "description": "Unique username"
+          },
+          "email": {
+            "type": "string",
+            "nullable": true,
+            "description": "User email address"
+          },
+          "phone": {
+            "type": "string",
+            "description": "User phone number"
+          },
+          "name": {
+            "type": "string",
+            "description": "Full name of the user"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when user was created"
+          }
+        },
+        "required": ["id", "username", "phone", "name"]
+      },
+      "Admin": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier for the admin"
+          },
+          "username": {
+            "type": "string",
+            "description": "Unique admin username"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when admin was created"
+          }
+        },
+        "required": ["id", "username"]
+      },
+      "Service": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Unique identifier for the service"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the service"
+          },
+          "price": {
+            "type": "number",
+            "format": "float",
+            "description": "Price of the service"
+          },
+          "duration": {
+            "type": "integer",
+            "description": "Duration in hours"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "Service description"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when service was created"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when service was last updated"
+          }
+        },
+        "required": ["id", "name", "price", "duration"]
+      },
+      "Order": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Unique identifier for the order"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Reference to user who placed the order"
+          },
+          "serviceId": {
+            "type": "integer",
+            "description": "Reference to service ordered"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["RECEIVED", "IN_PROGRESS", "READY_FOR_PICKUP", "COMPLETED", "CANCELLED"],
+            "default": "RECEIVED",
+            "description": "Current status of the order"
+          },
+          "notes": {
+            "type": "string",
+            "nullable": true,
+            "description": "Additional notes about the order"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when order was created"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when order was last updated"
+          }
+        },
+        "required": ["id", "userId", "serviceId", "status"]
+      },
+      "OrderStatus": {
+        "type": "string",
+        "enum": ["RECEIVED", "IN_PROGRESS", "READY_FOR_PICKUP", "COMPLETED", "CANCELLED"],
+        "description": "Possible status values for orders"
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       }
     }
   }
